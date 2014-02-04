@@ -10,15 +10,16 @@ require 'pry'
 class Revolution909 < Goliath::API
   use Goliath::Rack::Params
   use Goliath::Rack::Formatters::JSON
+  use Goliath::Rack::Render
 
   def response(env)
     begin
       result = ::Router.new(env[Goliath::Request::REQUEST_PATH],env[Goliath::Request::REQUEST_METHOD],env['QUERY_STRING']).route
     rescue Exception => exception
-      [404,{'Content-Type' => 'application/json'}, exception.message]
+      [404,{ "Access-Control-Allow-Origin" => "*"}, exception.message]
     else  
       response = result
-      [200,{'Content-Type' => 'application/json'},response.to_json]
+      [200,{ "Access-Control-Allow-Origin" => "*"},response]
     end
   end
 
@@ -31,7 +32,7 @@ class Repositories
 
 
   def search
-    EM::HttpRequest.new(Config.github_api+"/search/repositories?#{@params}").get.response
+    EM::HttpRequest.new(Config.github_api+"/search/repositories?#{@params}+in:name").get.response
   end
 end
 
