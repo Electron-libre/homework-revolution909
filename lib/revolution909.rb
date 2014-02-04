@@ -1,8 +1,7 @@
 $: << File.dirname(__FILE__)+'/../lib'
-require 'bundler'
-require 'json'
+require 'rubygems'
+require 'bundler/setup'
 require 'revolution909/router'
-require 'revolution909/config'
 require 'goliath'
 require 'em-synchrony/em-http'
 require 'pry'
@@ -18,21 +17,22 @@ class Revolution909 < Goliath::API
     rescue Exception => exception
       [404,{ "Access-Control-Allow-Origin" => "*"}, exception.message]
     else  
-      response = result
-      [200,{ "Access-Control-Allow-Origin" => "*"},response]
+      [200,{ "Access-Control-Allow-Origin" => "*"},result]
     end
   end
-
 end
+
 
 class Repositories
   def initialize(params)
     @params = params
   end
 
-
   def search
-    EM::HttpRequest.new(Config.github_api+"/search/repositories?#{@params}+in:name").get.response
+    http = EM::HttpRequest.new('https://api.github.com'+"/search/repositories?#{@params}+in:name").get
+    parsed = MultiJson.load(http.response)
+    search_result = parsed['items'].map {|item| {full_name: item['full_name'], href: item['full_name']} }
+    return {items: search_result, total_count: parsed['total_count']}
   end
 end
 
@@ -41,8 +41,8 @@ class Repository
     @id = id
   end
   def statistics
-    data = EM::HttpRequest.new(Config.github_api+"/repos/#{@id}/commits?page=1&per_page=100").get.response
-    parsed = JSON.parse(data)
+    data = EM::HttpRequest.new('https://api.github.com'+"/repos/#{@id}/commits?page=1&per_page=100").get
+    parsed = MultiJson.load(data.response)
     grouped_data = parsed.group_by { |commit| commit['author']}
     committers = map_committers(grouped_data)
     commits_dates = parsed.map {|c| c['commit']['committer']['date']}.sort

@@ -36,6 +36,7 @@ GEM
     log4r (1.1.10)
     method_source (0.8.2)
     multi_json (1.8.4)
+    oj (2.5.4)
     pry (0.9.12.6)
       coderay (~> 1.0)
       method_source (~> 0.8)
@@ -62,5 +63,6 @@ PLATFORMS
 DEPENDENCIES
   em-http-request
   goliath
+  oj
   pry
   rspec
