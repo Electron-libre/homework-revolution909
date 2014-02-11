@@ -42,17 +42,21 @@ class Repository
   end
   def statistics
     data = EM::HttpRequest.new('https://api.github.com'+"/repos/#{@id}/commits?page=1&per_page=100").get
-    parsed = MultiJson.load(data.response)
-    grouped_data = parsed.group_by { |commit| commit['author']}
-    committers = map_committers(grouped_data)
-    commits_dates = parsed.map {|c| c['commit']['committer']['date']}.sort
-    return {committers: committers, commits_dates: commits_dates} 
+    @parsed = MultiJson.load(data.response)
+    committers = map_committers
+    return {committers: committers } 
   end
 
   private
 
-  def map_committers(data)
-    data.map{|k,v| {committer: format_committer(k), commits: v.count}}
+  def committers_commits
+    @parsed.group_by { |commit| commit['committer']}
+  end
+
+  def map_committers
+    committers_commits.map do |k,v|
+      {committer: format_committer(k), commits: {count: v.count, dates: commit_timeline(v) }}
+    end
   end
 
   def format_committer(committer)
@@ -65,6 +69,27 @@ class Repository
     end
   end
 
+  def min_max_dates
+     map_block = Proc.new {|commit| commit['commit']['committer']['date']}
+     @min_date ||= map_block.call @parsed.min_by(&map_block)
+     @max_date ||= map_block.call @parsed.max_by(&map_block)
+     [@min_date,@max_date]
+  end
+
+
+  def build_dates_array
+    (DateTime.parse(min_max_dates[0]).to_date..DateTime.parse(min_max_dates[1]).to_date).map { |date| [date,0]}
+  end
+
+  
+  def commit_timeline(v)
+    ploted_timeline=   v.reduce(build_dates_array) do |timeline, commit|
+        date = DateTime.parse(commit['commit']['committer']['date']).to_date
+        timeline[timeline.find_index{|day| day[0] == date }][1] += 1
+        timeline
+    end
+   return ploted_timeline 
+  end
 
 end
 
