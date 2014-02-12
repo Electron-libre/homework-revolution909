@@ -57,7 +57,7 @@ class Repository
     data = EM::HttpRequest.new('https://api.github.com'+"/repos/#{@id}/commits?page=1&per_page=100").get
     @parsed = MultiJson.load(data.response)
     committers = map_committers
-    return {committers: committers } 
+    return {committers: committers , commits_count: @parsed.count} 
   end
 
   private
