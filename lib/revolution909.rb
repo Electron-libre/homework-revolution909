@@ -23,17 +23,30 @@ class Revolution909 < Goliath::API
 end
 
 
-class Repositories
+class Repositories 
   def initialize(params)
     @params = params
   end
 
   def search
-    http = EM::HttpRequest.new('https://api.github.com'+"/search/repositories?#{@params}+in:name").get
+    http = EM::HttpRequest.new('https://api.github.com'+"/search/repositories?#{@params}").get
     parsed = MultiJson.load(http.response)
     search_result = parsed['items'].map {|item| {full_name: item['full_name'], href: item['full_name']} }
-    return {items: search_result, total_count: parsed['total_count']}
+    return {items: search_result, total_count: parsed['total_count'], link: pagination_links(http)}
   end
+
+  def pagination_links(http)
+    link_header = http.response_header['LINK']
+    link_header.gsub(/\<|\>|;|"/, '').split(",").map do |lnk|
+      href, rel = lnk.split("rel=")
+      {
+        href: href.gsub(/https\:\/\/api\.github\.com\/search/),
+        rel: rel,
+        page: CGI.parse(URI.parse(href).query)['page']
+      }
+    end if link_header
+  end
+
 end
 
 class Repository
