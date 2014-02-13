@@ -40,7 +40,7 @@ class Repositories
     link_header.gsub(/\<|\>|;|"/, '').split(",").map do |lnk|
       href, rel = lnk.split("rel=")
       {
-        href: href.gsub(/https\:\/\/api\.github\.com\/search/),
+        href: href.gsub(/https\:\/\/api\.github\.com\/search/,''),
         rel: rel,
         page: CGI.parse(URI.parse(href).query)['page']
       }
