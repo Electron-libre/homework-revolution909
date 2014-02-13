@@ -1,21 +1,25 @@
-Dependencies === === === ===
+Dependencies 
+============
 
-* rvm * ruby 2.1 * bundler
+* rvm 
+* ruby 2.1 
+* bundler
 
-Installation === === === ===
+Installation
+============
 
 #Get sources# run` bundle install`# run` bundle exec ruby lib / revolution909.rb`
 
-Usage === ==
+Usage 
+=====
 
 
-Search
-for repository === === === === === === === === === === === === === ===
+Search for repository 
+=====================
+=====================
 
 
-GET / repositories ? q = {
-    Github formated search terms
-}
+GET / repositories ? q = {Github formated search terms}
 
 
 results format :
