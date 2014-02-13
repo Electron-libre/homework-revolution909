@@ -8,11 +8,11 @@ Dependencies
 Installation
 ============
 
-#Get sources# run` bundle install`# run` bundle exec ruby lib / revolution909.rb`
+# Get sources# run` bundle install`
+# run` bundle exec ruby lib / revolution909.rb`
 
 Usage 
 =====
-
 
 Search for repository 
 =====================
