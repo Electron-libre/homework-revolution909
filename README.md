@@ -58,4 +58,26 @@ results format :
 * Total count contains the number of repositories found
 * Items contains the 30 first results search with their href 
 
+Get Repository statistics
+========================
+========================
+
+GET /repositories/{repository_path}
+
+Returns :
+
+
+ {
+   "committers": [
+      {"login": 'committer login',
+      "avatar_url": 'committer_avatar_url",
+      "commits": {
+        "count" : 'users participation over last 100 commits'
+        "dates" : [[
+          'date in the last 100 commits interval': 'number of commits for this date'
+        ]]
+        }
+   ,...]
+   }
+
 
